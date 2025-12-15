@@ -29,6 +29,7 @@ type MySQLConfig struct {
 	Database    string `mapstructure:"database"`
 	MaxIdleConn int    `mapstructure:"max_idle_conn"`
 	MaxOpenConn int    `mapstructure:"max_open_conn"`
+	LogLevel    string `mapstructure:"log_level"` // GORM日志级别: silent, error, warn, info
 }
 
 // RedisConfig Redis 配置

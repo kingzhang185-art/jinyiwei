@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"go.uber.org/zap"
+	"go
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
 	"go.uber.org/zap"
 	"sentinel-opinion-monitor/internal/config"
 	appLogger "sentinel-opinion-monitor/internal/pkg/logger"
@@ -24,9 +25,30 @@ func Init(cfg *config.MySQLConfig) error {
 		cfg.Database,
 	)
 
+	// 配置GORM日志级别
+	logLevel := gormLogger.Info
+	if cfg.LogLevel != "" {
+		switch cfg.LogLevel {
+		case "silent":
+			logLevel = gormLogger.Silent
+		case "error":
+			logLevel = gormLogger.Error
+		case "warn":
+			logLevel = gormLogger.Warn
+		case "info":
+			logLevel = gormLogger.Info
+		default:
+			logLevel = gormLogger.Info
+		}
+	}
+
+	// 创建自定义logger，输出SQL到控制台
+	// 使用Default logger并设置日志级别，这样可以在终端看到SQL语句
+	customLogger := gormLogger.Default.LogMode(logLevel)
+
 	var err error
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: gormLogger.Default.LogMode(gormLogger.Info),
+		Logger: customLogger,
 	})
 	if err != nil {
 		return fmt.Errorf("连接 MySQL 失败: %w", err)
@@ -67,4 +89,3 @@ func Close() error {
 	}
 	return nil
 }
-

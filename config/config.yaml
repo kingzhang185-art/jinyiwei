@@ -9,6 +9,7 @@ mysql:
   database: opinion_db
   max_idle_conn: 10
   max_open_conn: 30
+  log_level: info  # GORM日志级别: silent, error, warn, info
 
 redis:
   addr: 127.0.0.1:6379
